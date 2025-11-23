@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Search</title>
+    <style>
+        body, html {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-bar {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            margin-bottom: 20px;
+            padding: 15px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .product-card .slider {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        .product-card .slider img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .product-card .slider img.active {
+            display: block;
+        }
+        .product-card .slider button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .product-card .slider .prev {
+            left: 10px;
+        }
+        .product-card .slider .next {
+            right: 10px;
+        }
+        .product-card .product-details {
+            display: none;
+            text-align: left;
+            margin-top: 10px;
+        }
+        .product-card .product-details p {
+            margin: 5px 0;
+        }
+        .product-card button {
+            padding: 8px 16px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .product-card button:hover {
+            background-color: darkorange;
+        }
+        .product-card .contact-info {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-bar">
+        <!-- Add search functionality here if required -->
+    </div>
+    <div class="container" id="results">
+        {% if results %}
+            {% for equipment in results %}
+                <div class="product-card">
+                    <!-- Slider for Images -->
+                    <div class="slider" id="slider-{{ loop.index }}">
+                        <img src="{{ equipment.image1 }}" class="active" alt="Image 1">
+                        <img src="{{ equipment.image2 }}" alt="Image 2">
+                        <img src="{{ equipment.image3 }}" alt="Image 3">
+                        <button class="prev" onclick="prevSlide('slider-{{ loop.index }}')">❮</button>
+                        <button class="next" onclick="nextSlide('slider-{{ loop.index }}')">❯</button>
+                    </div>
+
+                    <h3>{{ equipment.equipment_name }}</h3>
+                    <p><strong>Brand:</strong> {{ equipment.brand }}</p>
+                    <p><strong>Price:</strong> ${{ equipment.price }}</p>
+
+                    <!-- Button to Show Details -->
+                    <button onclick="showDetails({{ loop.index }})">Show Details</button>
+
+                    <!-- Product Details (Initially hidden) -->
+                    <div class="product-details" id="product-details-{{ loop.index }}">
+                        <p><strong>Name:</strong> {{ equipment.equipment_name }}</p>
+                        <p><strong>Brand:</strong> {{ equipment.brand }}</p>
+                        <p><strong>Age:</strong> {{ equipment.age }}</p>
+                        <p><strong>Condition:</strong> {{ equipment.condition }}</p>
+                        <p><strong>Usage Frequency:</strong> {{ equipment.usage_frequency }}</p>
+                        <p><strong>Fuel Type:</strong> {{ equipment.fuel_type }}</p>
+                        <p><strong>Horsepower:</strong> {{ equipment.horsepower }}</p>
+                        <p><strong>Price:</strong> ${{ equipment.price }}</p>
+                        <p><strong>Location:</strong> {{ equipment.location }}</p>
+                        <p><strong>Demand Level:</strong> {{ equipment.demand_level }}</p>
+                        <p><strong>Address:</strong> {{ equipment.address }}</p>
+                        <p><strong>Pincode:</strong> {{ equipment.pincode }}</p>
+                    </div>
+
+                    <!-- Delete Button -->
+                    <button onclick="deleteEquipment({{ equipment.id }})">Delete</button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No equipment found.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        let currentSlide = 0;
+
+        function showSlide(index, sliderId) {
+            let slides = document.querySelectorAll(`#${sliderId} img`);
+            if (index >= slides.length) currentSlide = 0;
+            if (index < 0) currentSlide = slides.length - 1;
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === currentSlide) slide.classList.add('active');
+            });
+        }
+
+        function nextSlide(sliderId) {
+            currentSlide++;
+            showSlide(currentSlide, sliderId);
+        }
+
+        function prevSlide(sliderId) {
+            currentSlide--;
+            showSlide(currentSlide, sliderId);
+        }
+
+        function showDetails(index) {
+            let details = document.getElementById(`product-details-${index}`);
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+        }
+
+function deleteEquipment(rowIndex) {
+    if (confirm("Are you sure you want to delete this equipment?")) {
+        fetch(`/delete_equipment/${rowIndex}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting equipment:", error);
+            alert("Failed to delete the equipment.");
+        });
+    }
+}
+
+    </script>
+</body>
+</html>
