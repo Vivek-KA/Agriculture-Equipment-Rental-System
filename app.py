@@ -4,7 +4,7 @@ import pandas as pd;
 import pymysql
 pymysql.install_as_MySQLdb()
 import pymysql as MySQLdb
-import matplotlib.pyplot  as plt;
+# import matplotlib.pyplot  as plt;
 from sklearn.model_selection  import train_test_split
 from sklearn.linear_model  import LogisticRegression
 from sklearn.metrics import accuracy_score,confusion_matrix
@@ -15,7 +15,7 @@ gmail_list1=[]
 password_list1=[]
 import numpy as np;
 import pandas as pd;
-import matplotlib.pyplot  as plt;
+# import matplotlib.pyplot  as plt;
 from sklearn.model_selection  import train_test_split
 from sklearn.linear_model  import LogisticRegression
 from sklearn.metrics import accuracy_score,confusion_matrix
