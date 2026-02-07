@@ -61,8 +61,12 @@ import os
 # Load the CSV data
 
 # Load the saved ML model
-with open('xgb_model.pkl', 'rb') as file:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "xgb_model.pkl")
+
+with open(MODEL_PATH, "rb") as file:
     loaded_model = pickle.load(file)
+
 
 
 
@@ -102,7 +106,13 @@ def logedinb():
 
 
 # Open database connection
-    db = MySQLdb.connect("localhost","root","","ddbb" )
+    db = MySQLdb.connect(
+    host=os.environ.get("DB_HOST"),
+    user=os.environ.get("DB_USER"),
+    passwd=os.environ.get("DB_PASSWORD"),
+    db=os.environ.get("DB_NAME")
+)
+
 
 # prepare a cursor object using cursor() method
     cursor = db.cursor()
@@ -163,7 +173,13 @@ def logedin():
 
 
 # Open database connection
-    db = MySQLdb.connect("localhost","root","","ddbb" )
+    db = MySQLdb.connect(
+    host=os.environ.get("DB_HOST", "localhost"),
+    user=os.environ.get("DB_USER", "root"),
+    passwd=os.environ.get("DB_PASSWORD", ""),
+    db=os.environ.get("DB_NAME", "ddbb")
+)
+
 
 # prepare a cursor object using cursor() method
     cursor = db.cursor()
@@ -368,7 +384,13 @@ def register():
 
 
 # Open database connection
-    db = MySQLdb.connect("localhost","root",'',"ddbb" )
+    db = MySQLdb.connect(
+    host=os.environ.get("DB_HOST", "localhost"),
+    user=os.environ.get("DB_USER", "root"),
+    passwd=os.environ.get("DB_PASSWORD", ""),
+    db=os.environ.get("DB_NAME", "ddbb")
+)
+
 
 # prepare a cursor object using cursor() method
     cursor = db.cursor()
@@ -567,4 +589,4 @@ def production11():
 def crop():
      return render_template('recommendation.html')
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
